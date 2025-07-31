@@ -1,6 +1,9 @@
 # PigeonPlay
-A simple 2d Javascript Game libary to easily create 2d games
+A simple 2d Javascript Game libary to easily create 2d games :)
 
+(NOT FINISHED YET)
+
+Here is an code example which renders a canvas and a sprite
 ```js
 import { Window } from "./pigeonsPlay.js";
 import { Rectangle } from "./pigeonsPlay.js";
