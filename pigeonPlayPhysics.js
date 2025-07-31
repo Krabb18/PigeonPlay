@@ -55,6 +55,7 @@ class PhysicsEntity
         return this.y + this.height;
     }
 }
+export{PhysicsEntity}
 
 class CollisionDetector
 {
@@ -76,13 +77,14 @@ class CollisionDetector
         var b2 = collidee.getBottom();
 
         if (b1 < t2 || t1 > b2 || r1 < l2 || l1 > r2) {
-        return false;
+            return false;
         }
     
         // If the algorithm made it here, it had to collide
         return true;
     }
 }
+export{CollisionDetector}
 
 class CollisionResolver
 {
@@ -98,8 +100,8 @@ class CollisionResolver
         var aMidX = entity2.getMidX();
         var aMidY = entity2.getMidY();
 
-        var dx = (aMidX - pMidX) / entity.halfWidth;
-        var dy = (aMidY - pMidY) / entity.halfHeight;
+        var dx = (aMidX - pMidX) / entity2.halfWidth;
+        var dy = (aMidY - pMidY) / entity2.halfHeight;
 
         var absDX = Math.abs(dx);
         var absDY = Math.abs(dy);
@@ -124,5 +126,28 @@ class CollisionResolver
                 entity1.y = entity2.getTop() - entity1.height;
             }
         }
+        else if(absDX > absDY)
+        {
+            if(dx < 0)
+            {
+                entity1.x = entity2.getRight();
+            }
+            else
+            {
+                entity1.x = entity2.getLeft() - entity1.width;
+            }
+        }
+        else
+        {
+            if(dy < 0)
+            {
+                entity1.y = entity2.getBottom();
+            }
+            else
+            {
+                entity1.y = entity2.getTop() - entity1.height;
+            }
+        }
     }
 }
+export{CollisionResolver}

@@ -84,12 +84,16 @@ class Rectangle extends GameObject
         this.color = 'blue';
         this.position = new Vector2(0.0, 0.0);
         this.scale = new Vector2(100.0, 100.0);
+        this.angle = 0.5;
     }
 
     draw()
     {
+        this.context.save();
+        //this.context.rotate(angle);
         this.context.fillStyle = 'blue';
         this.context.fillRect(this.position.x, this.position.y, this.scale.x, this.scale.x);
+        
     }
 }
 export{Rectangle}
@@ -103,6 +107,7 @@ class Sprite extends GameObject
         this.position = new Vector2(0.0, 0.0);
         this.scale = new Vector2(100.0, 100.0);
         this.spriteImg = new Image();
+        this.angleZ = 0.5;
 
         const img = new Image();
         img.onload = () =>
@@ -117,7 +122,10 @@ class Sprite extends GameObject
     {
         if(this.loaded)
         {
+            this.context.save();
+            //this.context.rotate(angle);
             this.context.drawImage(this.spriteImg, this.position.x, this.position.y, this.scale.x, this.scale.y);
+            this.context.restore();
         }
     }
 }
@@ -147,15 +155,42 @@ class Sound
 export{Sound}
 
 
-class Text
+class InputHandler
 {
     constructor()
     {
+        this.currentKeyDown = true;
+        this.keys = {};
+        document.addEventListener(
+            "keypress",
+            (event) =>
+            {
+                this.keys[event.key] = true;
+            },
+            false,
+        );
 
+        document.addEventListener(
+            "keyup",
+            (event) =>
+            {
+                this.keys[event.key] = false;
+            },
+            false,
+        );
     }
 
-    drawText()
+    isKeyDown(key)
     {
-        
+        return this.keys[key];
     }
+
+}
+export{InputHandler}
+
+
+export function drawText(text, font, context, x, y)
+{
+    context.font = font;
+    context.fillText(text, x, y);
 }
