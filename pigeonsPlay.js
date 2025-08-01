@@ -2,9 +2,12 @@
 class Window
 {
     #init;
+    #last;
     constructor(width, height)
     {
         this.#init = false;
+        this.#last = Date.now();
+        this.deltaTime = 0.0;
 
         this.canvas = document.createElement('canvas');
         this.canvas.id = 'meinCanvas';
@@ -21,6 +24,11 @@ class Window
 
     _loop()
     {
+        var now = Date.now();
+        var dt = now - this.#last;
+        this.#last = now;
+        this.deltaTime = dt;
+
         if(this.#init && this.isRunning)
         {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -84,7 +92,7 @@ class Rectangle extends GameObject
         this.color = 'blue';
         this.position = new Vector2(0.0, 0.0);
         this.scale = new Vector2(100.0, 100.0);
-        this.angle = 0.5;
+        this.angle = 0.0;
     }
 
     draw()
@@ -92,7 +100,16 @@ class Rectangle extends GameObject
         this.context.save();
         //this.context.rotate(angle);
         this.context.fillStyle = 'blue';
+
+        //rotation test
+        var sx = this.position.x + this.scale.x / 2;
+        var sy = this.position.y + this.scale.y / 2;
+        this.context.translate(sx, sy);
+        this.context.rotate(this.angle);
+        this.context.translate(-sx, -sy);
+
         this.context.fillRect(this.position.x, this.position.y, this.scale.x, this.scale.x);
+        this.context.restore()
         
     }
 }

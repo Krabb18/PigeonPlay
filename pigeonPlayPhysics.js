@@ -151,3 +151,41 @@ class CollisionResolver
     }
 }
 export{CollisionResolver}
+
+class PhysicsWorld
+{
+    constructor()
+    {
+        this.GRAVITY_X = 0.0;
+        this.GRAVITY_Y = 0.001;
+    }
+
+    step(elapsed, entities)
+    {
+        var gx = this.GRAVITY_X * elapsed;
+        var gy = this.GRAVITY_Y * elapsed;
+
+        for(var i = 0; i<entities.length; i++)
+        {
+            let entity = entities[i];
+            switch(entity.type)
+            {
+                case "DYNAMIC":
+                    entity.vx += entity.ax * elapsed + gx;
+                    entity.vy += entity.ay * elapsed + gy;
+                    entity.x  += entity.vx * elapsed;
+                    entity.y  += entity.vy * elapsed;
+                    break;
+
+                case "KINEMATIC":
+                    entity.vx += entity.ax * elapsed;
+                    entity.vy += entity.ay * elapsed;
+                    entity.x  += entity.vx * elapsed;
+                    entity.y  += entity.vy * elapsed;
+                    break;
+
+            }
+        }
+    }
+}
+export{PhysicsWorld}

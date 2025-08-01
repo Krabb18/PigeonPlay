@@ -1,4 +1,4 @@
-import { CollisionDetector, CollisionResolver, PhysicsEntity } from "./pigeonPlayPhysics.js";
+import { CollisionDetector, CollisionResolver, PhysicsEntity, PhysicsWorld } from "./pigeonPlayPhysics.js";
 import { InputHandler, Window } from "./pigeonsPlay.js";
 import { Rectangle } from "./pigeonsPlay.js";
 import { Sprite } from "./pigeonsPlay.js";
@@ -15,14 +15,19 @@ let rect = new Rectangle(window.context);
 let rect2 = new Rectangle(window.context);
 rect2.position.y = 700.0;
 
+let entitys = [];
 
-let box1 = new PhysicsEntity("box1", "none");
+let box1 = new PhysicsEntity("box1", "DYNAMIC");
 box1.width = 100.0;
 box1.height = 100.0;
-let box2 = new PhysicsEntity("box2", "none");
+entitys.push(box1);
+
+let box2 = new PhysicsEntity("box2", "KINEMATIC");
 box2.width = 100.0;
 box2.height = 700.0;
+entitys.push(box2);
 
+let world = new PhysicsWorld();
 let collisionDetector = new CollisionDetector();
 let collisionResolver = new CollisionResolver();
 
@@ -32,48 +37,65 @@ let inputHandler = new InputHandler();
 
 window.onStarted = function()
 {
-    console.log("HII start");
     //sound.play();
-}
-
-window.onUpdate = function()
-{
-    drawText("Hellos", "30px serif", window.context, 10, 50);
-    if(inputHandler.isKeyDown('d'))
-    {
-        rect.position.x += 5.0;
-    }
-    else if(inputHandler.isKeyDown('a'))
-    {
-        rect.position.x -= 5.0;
-    }
-    else if(inputHandler.isKeyDown('w'))
-    {
-        rect.position.y -= 5.0;
-    }
-    else if(inputHandler.isKeyDown('s'))
-    {
-        rect.position.y += 5.0;
-    }
-
     box1.x = rect.position.x;
     box1.y = rect.position.y;
     box2.x = rect2.position.x;
     box2.y = rect2.position.y;
+}
+let p = false;
+window.onUpdate = function()
+{
+    drawText("Hello PigeonPlay", "30px Comic Sans MS", window.context, 10, 50);
+    
+    if(inputHandler.isKeyDown('d'))
+    {
+        box1.x += 1.0 * window.deltaTime;
+    }
+    else if(inputHandler.isKeyDown('a'))
+    {
+        box1.x -= 1.0 * window.deltaTime;
+    }
+    else if(inputHandler.isKeyDown('w'))
+    {
+        box1.y -= 1.0 * window.deltaTime;
+    }
+    else if(inputHandler.isKeyDown('s'))
+    {
+       box1.y += 1.0 * window.deltaTime;
+    }
+
+    else if(inputHandler.isKeyDown('m') && !p)
+    {
+        box1.vy = 0.0;
+       box1.vy = -0.9;
+       //p = true;
+    }
+    
+    if(box1.vy > 1.09)
+    {
+        box1.vy = 0.0;
+    }
+
+
+    world.step(window.deltaTime, entitys);
+    rect.position.x = box1.x;
+    rect.position.y = box1.y;
+
 
     const didCollide = collisionDetector.collideRect(box1, box2);
-    console.log(didCollide);
 
-    collisionResolver.resolveElastic(box1, box2);
     if(didCollide)
     {
+        collisionResolver.resolveElastic(box1, box2);
         rect.position.x = box1.x;
         rect.position.y = box1.y;
     }
 
     rect.draw();
     rect2.draw();
-    console.log("HII Upate");
+
+
 }
 
 window.start();
