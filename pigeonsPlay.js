@@ -99,7 +99,7 @@ class Rectangle extends GameObject
     {
         this.context.save();
         //this.context.rotate(angle);
-        this.context.fillStyle = 'blue';
+        this.context.fillStyle = this.color;
 
         //rotation test
         var sx = this.position.x + this.scale.x / 2;
@@ -206,8 +206,35 @@ class InputHandler
 export{InputHandler}
 
 
-export function drawText(text, font, context, x, y)
+export function drawText(text, font, context, x, y, scale, color)
 {
+    context.fillStyle = color;
     context.font = font;
-    context.fillText(text, x, y);
+    context.fillText(text, x, y, scale);
 }
+
+class Button
+{
+    constructor(context)
+    {
+        this.context = context;
+        this.position = new Vector2(0.0, 0.0);
+        this.scale = new Vector2(200.0, 100.0);
+        this.buttonText = "Hello";
+        
+        //this.buttonColor;
+        this.textColor = '#eeaa00';
+    }
+
+    drawButton()
+    {
+        this.context.save();
+        this.context.fillRect(this.position.x, this.position.y, this.scale.x, this.scale.y);
+
+        this.context.textAlign = 'center';
+        this.context.textBaseline = 'middle';
+        drawText(this.buttonText, '25px Comic Sans MS', this.context ,this.position.x + this.scale.x / 2, this.position.y + this.scale.y / 2, this.scale.x, this.textColor);
+        this.context.restore();
+    }
+}
+export{Button}

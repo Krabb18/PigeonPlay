@@ -22,10 +22,17 @@ class PhysicsEntity
         // Acceleration
         this.ax = 0;
         this.ay = 0;
+
+        this.restitution = 0.3;
+
+        //mass
+        this.mass = 1.0;
+        this.inertia = 0.0;
     }
 
     updateBounds()
     {
+        this.inertia = (1.0/12) * this.mass * (this.width**2 + this.height**2);
         this.halfWidth = this.width * .5;
         this.halfHeight = this.height * .5;
     }
@@ -85,6 +92,21 @@ class CollisionDetector
     }
 }
 export{CollisionDetector}
+
+
+function computeCollisionNormal(entity1, entity2) {
+    const dx = entity2.getMidX() - entity1.getMidX();
+    const dy = entity2.getMidY() - entity1.getMidY();
+
+    const overlapX = (entity1.halfWidth + entity2.halfWidth) - Math.abs(dx);
+    const overlapY = (entity1.halfHeight + entity2.halfHeight) - Math.abs(dy);
+
+    if (overlapX < overlapY) {
+        return { x: dx < 0 ? -1 : 1, y: 0 };
+    } else {
+        return { x: 0, y: dy < 0 ? -1 : 1 };
+    }
+}
 
 class CollisionResolver
 {
@@ -149,6 +171,39 @@ class CollisionResolver
             }
         }
     }
+
+    resolveCollision(entity1, entity2)
+    {
+        let rvx = entity2.vx - entity1.vx;
+        let rvy = entity2.vy - entity1.vy;
+
+        //const normal
+        const normal = computeCollisionNormal(entity1, entity2);
+
+        const velAlongNormal = rvx * normal.x + rvy * normal.y;
+        if (velAlongNormal > 0) return;
+
+        const e = Math.min(entity1.restitution, entity2.restitution);
+
+        let j = -(1 + e) * velAlongNormal;
+        j /= (1 / entity1.mass) + (1 / entity2.mass);
+
+        const impulseX = j * normal.x;
+        const impulseY = j * normal.y;
+
+        if(entity1.type == "DYNAMIC")
+        {
+            entity1.vx -= 1 / entity1.mass * impulseX;
+            entity1.vy -= 1 / entity1.mass * impulseY;
+        }
+
+        if(entity2.type == "DYNAMIC")
+        {
+            entity2.vx += 1 / entity2.mass * impulseX;
+            entity2.vy += 1 / entity2.mass * impulseY;
+        }
+
+    }
 }
 export{CollisionResolver}
 
@@ -168,6 +223,7 @@ class PhysicsWorld
         for(var i = 0; i<entities.length; i++)
         {
             let entity = entities[i];
+            entity.updateBounds();
             switch(entity.type)
             {
                 case "DYNAMIC":
