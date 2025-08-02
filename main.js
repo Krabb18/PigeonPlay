@@ -1,5 +1,5 @@
 import { CollisionDetector, CollisionResolver, PhysicsEntity, PhysicsWorld } from "./pigeonPlayPhysics.js";
-import { InputHandler, Window, Rectangle, Sprite, Sound, drawText, Button } from "./pigeonsPlay.js";
+import { InputHandler, Window, Rectangle, Sprite, Sound, drawText, Button, getMousePosition } from "./pigeonsPlay.js";
 
 
 let window = new Window(1200, 800);
@@ -33,6 +33,10 @@ let sound = new Sound("donkey-kong.mp3", false);
 let inputHandler = new InputHandler();
 
 let button = new Button(window.context);
+button.onButtonClick = function()
+{
+    console.log("BUTTON GEKLAPPT");
+}
 
 window.onStarted = function()
 {
@@ -96,13 +100,12 @@ window.onUpdate = function()
         collisionResolver.resolveElastic(box1, box2);
     }
 
-    button.position.x = 300.0;
-    button.position.y = 300.0;
-    button.drawButton();
-
     rect.draw();
     rect2.draw();
 
+    button.position.x = 300.0;
+    button.position.y = 300.0;
+    button.drawButton();
 
 }
 

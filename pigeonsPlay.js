@@ -1,4 +1,6 @@
 
+import { PhysicsEntity, CollisionDetector } from "./pigeonPlayPhysics.js";
+
 class Window
 {
     #init;
@@ -195,6 +197,18 @@ class InputHandler
             },
             false,
         );
+
+        document.addEventListener("mousedown", (event) => {
+            if(event.button === 0){this.keys["mouseleft"] = true;}
+            else if(event.button === 1){this.keys["mousemiddle"] = true;}
+            else if(event.button === 2){this.keys["mouseright"] = true;}
+        });
+
+        document.addEventListener("mouseup", (event) => {
+            if(event.button === 0){this.keys["mouseleft"] = false;}
+            else if(event.button === 1){this.keys["mousemiddle"] = false;}
+            else if(event.button === 2){this.keys["mouseright"] = false;}
+        });
     }
 
     isKeyDown(key)
@@ -213,10 +227,30 @@ export function drawText(text, font, context, x, y, scale, color)
     context.fillText(text, x, y, scale);
 }
 
+let posX = 0;
+let posY = 0;
+document.addEventListener('mousemove', function(event)
+{
+    posX = event.clientX;
+    posY = event.clientY;
+    //console.log('Mouse X:', event.clientX, 'Mouse Y:', event.clientY);
+});
+
+export function getMousePosition()
+{
+    let pos = new Vector2(posX, posY);
+    return pos;
+}
+
 class Button
 {
+    #detector;
+    #inputHandler;
     constructor(context)
     {
+        this.#detector = new CollisionDetector();
+        this.#inputHandler = new InputHandler();
+
         this.context = context;
         this.position = new Vector2(0.0, 0.0);
         this.scale = new Vector2(200.0, 100.0);
@@ -226,8 +260,42 @@ class Button
         this.textColor = '#eeaa00';
     }
 
+    mouseOver()
+    {
+        let mousePos = getMousePosition();
+        let mouseBox = new PhysicsEntity();
+        mouseBox.x = mousePos.x;
+        mouseBox.y = mousePos.y;
+        mouseBox.width = 2;
+        mouseBox.height = 2;
+
+        let buttonBox = new PhysicsEntity();
+        buttonBox.x = this.position.x;
+        buttonBox.y = this.position.y;
+        buttonBox.width = this.scale.x;
+        buttonBox.height = this.scale.y;
+
+        const didCollide = this.#detector.collideRect(mouseBox, buttonBox);
+        return didCollide;
+    }
+
+    onButtonClick()
+    {
+
+    }
+
     drawButton()
     {
+
+        //check if button was pressed
+        if(this.mouseOver() && this.#inputHandler.isKeyDown("mouseleft"))
+        {
+            this.onButtonClick();
+            this.#inputHandler.keys["mouseleft"] = false;
+        }
+
+        const out = this.mouseOver();
+        console.log(out);
         this.context.save();
         this.context.fillRect(this.position.x, this.position.y, this.scale.x, this.scale.y);
 
